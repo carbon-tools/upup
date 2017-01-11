@@ -53,14 +53,14 @@ class ResourceListAPI(flask_restful.Resource):
 
 @api_v1.resource('/resource/<string:key>/', endpoint='api.resource')
 class ResourceAPI(flask_restful.Resource):
-  @auth.login_required
+  @auth.admin_required
   def get(self, key):
     resource_db = ndb.Key(urlsafe=key).get()
     if not resource_db and resource_db.user_key != auth.current_user_key():
       helpers.make_not_found_exception('Resource %s not found' % key)
     return helpers.make_response(resource_db, model.Resource.FIELDS)
 
-  @auth.login_required
+  @auth.admin_required
   def delete(self, key):
     resource_db = ndb.Key(urlsafe=key).get()
     if not resource_db or resource_db.user_key != auth.current_user_key():
@@ -71,7 +71,7 @@ class ResourceAPI(flask_restful.Resource):
 
 @api_v1.resource('/resource/upload/', endpoint='api.resource.upload')
 class ResourceUploadAPI(flask_restful.Resource):
-  @auth.login_required
+  @auth.admin_required
   def get(self):
     count = util.param('count', int) or 1
     urls = []
@@ -86,7 +86,7 @@ class ResourceUploadAPI(flask_restful.Resource):
         'result': urls,
       })
 
-  @auth.login_required
+  @auth.admin_required
   def post(self):
     resource_db = resource_db_from_upload()
     if resource_db:

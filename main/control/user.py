@@ -131,7 +131,7 @@ def user_update(user_id=0):
 # User Verify
 ###############################################################################
 @app.route('/user/verify/<token>/')
-@auth.login_required
+@auth.admin_required
 def user_verify(token):
   user_db = auth.current_user_db()
   if user_db.token != token:

@@ -17,7 +17,7 @@ from main import app
 # Profile View
 ###############################################################################
 @app.route('/profile/')
-@auth.login_required
+@auth.admin_required
 def profile():
   user_db = auth.current_user_db()
 
@@ -45,7 +45,7 @@ class ProfileUpdateForm(flask_wtf.FlaskForm):
 
 
 @app.route('/profile/update/', methods=['GET', 'POST'])
-@auth.login_required
+@auth.admin_required
 def profile_update():
   user_db = auth.current_user_db()
   form = ProfileUpdateForm(obj=user_db)
@@ -87,7 +87,7 @@ class ProfilePasswordForm(flask_wtf.FlaskForm):
 
 
 @app.route('/profile/password/', methods=['GET', 'POST'])
-@auth.login_required
+@auth.admin_required
 def profile_password():
   if not config.CONFIG_DB.has_email_authentication:
     flask.abort(418)

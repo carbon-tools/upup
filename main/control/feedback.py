@@ -19,7 +19,7 @@ class FeedbackForm(flask_wtf.FlaskForm):
   )
   email = wtforms.StringField(
     'Your email',
-    [wtforms.validators.optional(), wtforms.validators.email()],
+    [wtforms.validators.required(), wtforms.validators.email()],
     filters=[util.email_filter],
   )
   recaptcha = flask_wtf.RecaptchaField()

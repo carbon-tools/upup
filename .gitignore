@@ -13,3 +13,8 @@ main/static/ext
 main/static/min
 node_modules
 temp/
+activate/
+.vscode/
+include/
+lib/
+pip-selfcheck.json

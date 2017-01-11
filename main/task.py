@@ -49,6 +49,39 @@ def new_user_notification(user_db):
 ###############################################################################
 # User Related
 ###############################################################################
+def subscribe_email_notification(user_db):
+  if not (config.CONFIG_DB.verify_email and user_db.email) or user_db.verified:
+    return
+  user_db.token = util.uuid()
+  user_db.put()
+
+  to = '%s <%s>' % (user_db.name, user_db.email)
+  body = '''Hello %(name)s,
+
+it seems someone (hopefully you) tried to subscribe your email with %(brand)s.
+
+In case it was you, please verify it by following this link:
+
+%(link)s
+
+If it wasn't you, we apologize. You can either ignore this email or reply to it
+so we can take a look.
+
+Best regards,
+%(brand)s
+''' % {
+    'name': user_db.name,
+    'link': flask.url_for('user_verify', token=user_db.token, _external=True),
+    'brand': config.CONFIG_DB.brand_name,
+  }
+
+  flask.flash(
+    'A subscription confirmation link has been sent to your email address.',
+    category='success',
+  )
+  send_mail_notification('Confirm Subscription to Carbon.tools', body, to)
+
+
 def verify_email_notification(user_db):
   if not (config.CONFIG_DB.verify_email and user_db.email) or user_db.verified:
     return

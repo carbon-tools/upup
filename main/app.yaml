@@ -46,12 +46,25 @@ handlers:
   static_dir: static/
   expiration: "365d"
 
+- url: /
+  script: main.app
+  secure: always
+  redirect_http_response_code: 301
+
+
 - url: /serve/.*
+  login: admin
   script: control.serve.app
+
+- url: /(signin|signout)/.*
+  script: main.app
+  secure: always
+  redirect_http_response_code: 301
 
 - url: /.*
   script: main.app
   secure: always
+  login: admin
   redirect_http_response_code: 301
 
 skip_files:

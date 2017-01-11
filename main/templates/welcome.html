@@ -1,10 +1,26 @@
 # extends 'base.html'
+# import 'macro/forms.html' as forms
 
 # block header
   <div class="jumbotron">
     <div class="container">
-      <h1>{{config.CONFIG_DB.brand_name}}</h1>
-      <p>Hello, world!</p>
+      <div class="row">
+        <div class="col-sm-12 col-md-8 col-lg-8">
+          <h1>{{config.CONFIG_DB.brand_name}}</h1>
+          <p>Publishing and Authoring on the web made easy!</p>
+        </div>
+        <div class="col-sm-12 col-md-4 col-lg-4">
+          <form method="POST" action="{{url_for('subscribe')}}" novalidate>
+            {{form.csrf_token}}
+            {{forms.email_field(form.email, autofocus=True, class='form-control input-lg', placeholder="Email")}}
+            <div class="controls">
+              <button type="submit" class="btn btn-block btn-lg btn-primary btn-loading" {{forms.data_loading_text()}}>
+                Let me know when you launch!
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 # endblock
@@ -12,20 +28,20 @@
 # block content
   <div class="row">
     <div class="col-sm-6 col-md-4 col-lg-3">
-      <h2>Heading</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <h2>Carbon<br/>Editor</h2>
+      <p>In-browser rich visual document editor on desktop/mobile with many services integrations</p>
     </div>
     <div class="col-sm-6 col-md-4 col-lg-3">
-      <h2>Heading</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <h2>Carbon<br/>Image</h2>
+      <p>Out of the box image uploading, hosting, manipulation and layouting integrated seamlessly in Carbon Editor</p>
     </div>
     <div class="col-sm-6 col-md-4 col-lg-3">
-      <h2>Heading</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <h2>Carbon<br/>Extensions</h2>
+      <p>Extensions add super-powers to your publishing work-flow, allowing you to layout images, format text, embed different components (from many providers including YouTube, Facebook Twitter and others).</p>
     </div>
     <div class="col-sm-6 col-md-12 col-lg-3">
-      <h2>Heading</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <h2>Carbon<br/>Apps</h2>
+      <p>Ready to deploy packaged apps built on top of Carbon.tools and allows you to deploy your own hosted instances.</p>
     </div>
   </div>
 # endblock
