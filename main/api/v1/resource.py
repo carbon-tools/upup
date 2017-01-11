@@ -96,7 +96,6 @@ def _split_storage_url(storage_object_url):
 
 @api_v1.resource('/resource/upload/', endpoint='api.resource.upload')
 class ResourceUploadAPI(flask_restful.Resource):
-
   @flask_cors.cross_origin()
   def options(self):
     return flask.jsonify({})
