@@ -40,7 +40,7 @@ def resource_upload():
 @app.route('/resource/', endpoint='resource_list')
 @auth.admin_required
 def resource_list():
-  resource_dbs, resource_cursor = auth.current_user_db().get_resource_dbs()
+  resource_dbs, resource_cursor = model.Resource.get_dbs()
 
   return flask.render_template(
     'resource/resource_list.html',
@@ -60,7 +60,7 @@ def resource_list():
 def resource_view(resource_id):
   resource_db = model.Resource.get_by_id(resource_id)
 
-  if not resource_db or resource_db.user_key != auth.current_user_key():
+  if not resource_db:
     return flask.abort(404)
 
   return flask.render_template(
@@ -84,7 +84,7 @@ class ResourceUpdateForm(flask_wtf.FlaskForm):
 def resource_update(resource_id):
   resource_db = model.Resource.get_by_id(resource_id)
 
-  if not resource_db or resource_db.user_key != auth.current_user_key():
+  if not resource_db:
     return flask.abort(404)
 
   form = ResourceUpdateForm(obj=resource_db)
@@ -113,7 +113,7 @@ def resource_update(resource_id):
 @auth.admin_required
 def resource_download(resource_id):
   resource_db = model.Resource.get_by_id(resource_id)
-  if not resource_db or resource_db.user_key != auth.current_user_key():
+  if not resource_db:
     return flask.abort(404)
   name = urllib.quote(resource_db.name.encode('utf-8'))
   url = '/serve/%s?save_as=%s' % (resource_db.blob_key, name)

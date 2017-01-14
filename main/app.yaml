@@ -51,6 +51,10 @@ handlers:
   secure: always
   redirect_http_response_code: 301
 
+- url: /api/v1/resource/upload/?
+  script: main.app
+  secure: always
+  redirect_http_response_code: 301
 
 - url: /serve/.*
   login: admin

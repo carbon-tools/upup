@@ -6,6 +6,7 @@ from google.appengine.api import images
 from google.appengine.ext import blobstore
 from google.appengine.ext import ndb
 import flask
+import flask_cors
 import flask_restful
 import werkzeug
 
@@ -56,14 +57,14 @@ class ResourceAPI(flask_restful.Resource):
   @auth.admin_required
   def get(self, key):
     resource_db = ndb.Key(urlsafe=key).get()
-    if not resource_db and resource_db.user_key != auth.current_user_key():
+    if not resource_db:
       helpers.make_not_found_exception('Resource %s not found' % key)
     return helpers.make_response(resource_db, model.Resource.FIELDS)
 
   @auth.admin_required
   def delete(self, key):
     resource_db = ndb.Key(urlsafe=key).get()
-    if not resource_db or resource_db.user_key != auth.current_user_key():
+    if not resource_db:
       helpers.make_not_found_exception('Resource %s not found' % key)
     delete_resource_key(resource_db.key)
     return helpers.make_response(resource_db, model.Resource.FIELDS)
@@ -71,7 +72,12 @@ class ResourceAPI(flask_restful.Resource):
 
 @api_v1.resource('/resource/upload/', endpoint='api.resource.upload')
 class ResourceUploadAPI(flask_restful.Resource):
-  @auth.admin_required
+
+  @flask_cors.cross_origin()
+  def options(self):
+    return flask.jsonify({})
+
+  @flask_cors.cross_origin()
   def get(self):
     count = util.param('count', int) or 1
     urls = []
@@ -86,7 +92,7 @@ class ResourceUploadAPI(flask_restful.Resource):
         'result': urls,
       })
 
-  @auth.admin_required
+  @flask_cors.cross_origin()
   def post(self):
     resource_db = resource_db_from_upload()
     if resource_db:
