@@ -84,7 +84,7 @@ class ResourceUploadAPI(flask_restful.Resource):
     for i in range(count):
       urls.append({'upload_url': blobstore.create_upload_url(
           flask.request.path,
-          gs_bucket_name=config.CONFIG_DB.bucket_name or None,
+          gs_bucket_name=get_bucket_and_path_name() or None,
         )})
     return flask.jsonify({
         'status': 'success',
@@ -128,7 +128,7 @@ def resource_db_from_upload():
   image_url = None
   if blob_info.content_type.startswith('image'):
     try:
-      image_url = images.get_serving_url(blob_info.key())
+      image_url = images.get_serving_url(blob_info.key(), secure_url=True)
     except:
       pass
 
@@ -139,7 +139,13 @@ def resource_db_from_upload():
       content_type=blob_info.content_type,
       size=blob_info.size,
       image_url=image_url,
-      bucket_name=config.CONFIG_DB.bucket_name or None,
+      bucket_name=get_bucket_and_path_name() or None,
     )
   resource_db.put()
   return resource_db
+
+def get_bucket_and_path_name():
+  origin = flask.request.headers.get('your-header-name')
+  if origin:
+    origin = o.replace('https://', '').replace('http://', '')
+  return '%s/%s'.format(config.CONFIG_DB.bucket_name, origin or 'no-origin')
