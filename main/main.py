@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import flask
+import flask_cors
 
 import config
 import util
@@ -22,6 +23,8 @@ app.jinja_env.globals.update(
   slugify=util.slugify,
   update_query_argument=util.update_query_argument,
 )
+
+flask_cors.CORS(app)
 
 import auth
 import control
