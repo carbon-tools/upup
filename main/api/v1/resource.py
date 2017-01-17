@@ -145,7 +145,8 @@ def resource_db_from_upload():
   return resource_db
 
 def get_bucket_and_path_name():
-  origin = flask.request.headers.get('your-header-name')
+  origin = flask.request.headers.get('origin')
   if origin:
-    origin = o.replace('https://', '').replace('http://', '')
-  return '%s/%s'.format(config.CONFIG_DB.bucket_name, origin or 'no-origin')
+    origin = origin.replace('https://', '').replace('http://', '')
+  bucket = '{}/{}'.format(config.CONFIG_DB.bucket_name, origin or 'no-origin')
+  return bucket
