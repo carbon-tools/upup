@@ -8,3 +8,4 @@ flask==0.12
 pyjwt==1.4.2
 unidecode==0.4.20
 webargs==1.5.3
+google-api-python-client==1.6.2

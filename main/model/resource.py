@@ -16,6 +16,8 @@ class Resource(model.Base):
   name = ndb.StringProperty(required=True)
   bucket_name = ndb.StringProperty()
   image_url = ndb.StringProperty(default='')
+  public_url = ndb.StringProperty(default='')
+  gcs_object_path = ndb.StringProperty(default='')
   content_type = ndb.StringProperty(default='')
   size = ndb.IntegerProperty(default=0)
 

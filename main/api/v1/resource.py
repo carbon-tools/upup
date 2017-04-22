@@ -2,6 +2,7 @@
 
 from __future__ import absolute_import
 
+import json
 from google.appengine.api import images
 from google.appengine.ext import blobstore
 from google.appengine.ext import ndb
@@ -10,6 +11,7 @@ import flask_cors
 import flask_restful
 import werkzeug
 
+import email
 from api import helpers
 import auth
 import config
@@ -18,6 +20,10 @@ import util
 
 from main import api_v1
 
+from googleapiclient import discovery
+from oauth2client.client import GoogleCredentials
+credentials = GoogleCredentials.get_application_default()
+storage = discovery.build('storage', 'v1', credentials=credentials)
 
 ###############################################################################
 # Endpoints
@@ -68,6 +74,24 @@ class ResourceAPI(flask_restful.Resource):
       helpers.make_not_found_exception('Resource %s not found' % key)
     delete_resource_key(resource_db.key)
     return helpers.make_response(resource_db, model.Resource.FIELDS)
+
+
+def extract_cloud_storage_meta_data(file_storage):
+  """ Exctract the cloud storage meta data from a file. """
+  uploaded_headers = _format_email_headers(file_storage.read())
+  storage_object_url = uploaded_headers.get(blobstore.CLOUD_STORAGE_OBJECT_HEADER, None)
+  return tuple(_split_storage_url(storage_object_url))
+
+def _format_email_headers(raw_headers):
+  """ Returns an email message containing the headers from the raw_headers. """
+  message = email.message.Message()
+  message.set_payload(raw_headers)
+  payload = message.get_payload(decode=True)
+  return email.message_from_string(payload)
+
+def _split_storage_url(storage_object_url):
+  """ Returns a list containing the bucket id and the object id. """
+  return storage_object_url.split("/")[2:]
 
 
 @api_v1.resource('/resource/upload/', endpoint='api.resource.upload')
@@ -121,16 +145,39 @@ def resource_db_from_upload():
     uploaded_file = flask.request.files['file']
   except:
     return None
+
+  bucket_name, origin_dir, object_name = extract_cloud_storage_meta_data(uploaded_file)
   headers = uploaded_file.headers['Content-Type']
   blob_info_key = werkzeug.parse_options_header(headers)[1]['blob-key']
   blob_info = blobstore.BlobInfo.get(blob_info_key)
 
+  gcs_object_path = "{}/{}/{}".format(bucket_name, origin_dir, object_name)
   image_url = None
+  public_url = None
   if blob_info.content_type.startswith('image'):
     try:
       image_url = images.get_serving_url(blob_info.key(), secure_url=True)
     except:
       pass
+  else:
+    response = storage.objects().patch(
+        bucket=bucket_name,
+        object="{}/{}".format(origin_dir, object_name),
+        body={'acl': [{
+          "entity": "project-owners-825037505474",
+          "role": "OWNER",
+        }, {
+          "entity": "project-editors-825037505474",
+          "role": "OWNER",
+        }, {
+          "entity": "project-viewers-825037505474",
+          "role": "READER",
+        },{
+          "entity": "allUsers",
+          "READER",
+        }]}).execute()
+    public_url = "https://storage.googleapis.com/{}?content_type={}".format(
+        gcs_object_path, blob_info.content_type)
 
   resource_db = model.Resource(
       user_key=auth.current_user_key(),
@@ -139,7 +186,9 @@ def resource_db_from_upload():
       content_type=blob_info.content_type,
       size=blob_info.size,
       image_url=image_url,
+      public_url=public_url,
       bucket_name=get_bucket_and_path_name() or None,
+      gcs_object_path=gcs_object_path,
     )
   resource_db.put()
   return resource_db
