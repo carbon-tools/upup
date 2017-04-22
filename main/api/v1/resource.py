@@ -165,16 +165,16 @@ def resource_db_from_upload():
         object="{}/{}".format(origin_dir, object_name),
         body={'acl': [{
           "entity": "project-owners-825037505474",
-          "role": "OWNER",
+          "role": "OWNER"
         }, {
           "entity": "project-editors-825037505474",
-          "role": "OWNER",
+          "role": "OWNER"
         }, {
           "entity": "project-viewers-825037505474",
-          "role": "READER",
-        },{
+          "role": "READER"
+        }, {
           "entity": "allUsers",
-          "READER",
+          "role": "READER"
         }]}).execute()
     public_url = "https://storage.googleapis.com/{}?content_type={}".format(
         gcs_object_path, blob_info.content_type)

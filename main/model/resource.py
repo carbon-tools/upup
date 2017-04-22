@@ -52,6 +52,8 @@ class Resource(model.Base):
     'image_url': fields.String,
     'name': fields.String,
     'serve_url': fields.String,
+    'public_url': fields.String,
+    'gcs_object_path': fields.String,
     'size': fields.Integer,
     'size_human': fields.String,
     'view_url': fields.String,
